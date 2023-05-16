@@ -1,0 +1,33 @@
+{
+    "apiFields": [
+        {
+            "fieldId": "id",
+            "name": "ID",
+            "kind": "number",
+            "required": true
+        },
+        {
+            "fieldId": "title",
+            "name": "タイトル",
+            "kind": "text",
+            "required": true
+        },
+        {
+            "fieldId": "title",
+            "name": "本文",
+            "kind": "textArea",
+            "required": true
+        },
+        {
+            "fieldId": "category",
+            "name": "カテゴリ",
+            "kind": "relation",
+            "required": true
+        },
+        {
+            "fieldId": "image",
+            "name": "画像"
+        }
+    ],
+    "customFields": []
+}
