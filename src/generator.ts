@@ -35,6 +35,9 @@ export class CMSCodeGenerator {
                 return StringPropertyFactory.generate(field.fieldId);
             } else if (field.kind === "image") {
                 return ReferencePropertyFactory.generate("Image", field.fieldId);
+            } else if (field.kind === "relation") {
+                const relation = this.schemas.find(schema => schema.name === field.fieldId.charAt(0).toUpperCase() + field.fieldId.slice(1).toLowerCase());
+                return relation ? ReferencePropertyFactory.generate(relation.name, field.fieldId) : AnyPropertyFactory.generate(field.fieldId);
             } else {
                 return AnyPropertyFactory.generate(field.fieldId);
             }
