@@ -1,15 +1,19 @@
-import { KeywordTypeNode, PropertySignature, SyntaxKind, TypeReferenceNode, factory } from "typescript";
+import { KeywordTypeNode, PropertySignature, PunctuationToken, SyntaxKind, TypeReferenceNode, factory } from "typescript";
 
 export class PropertyFactory {
 
     static node: KeywordTypeNode<any> = factory.createKeywordTypeNode(SyntaxKind.AnyKeyword);
 
-    static generateProperty(name: string): PropertySignature {
-        return factory.createPropertySignature(undefined, name, undefined, this.node);
+    private static generateQuestionToken(required: boolean): PunctuationToken<SyntaxKind.QuestionToken> | undefined {
+        return required ? undefined : factory.createToken(SyntaxKind.QuestionToken);
     }
 
-    static generateArrayProperty(name: string): PropertySignature {
-        return factory.createPropertySignature(undefined, name, undefined, factory.createArrayTypeNode(this.node));
+    static generateProperty(name: string, required: boolean): PropertySignature {
+        return factory.createPropertySignature(undefined, name, this.generateQuestionToken(required), this.node);
+    }
+
+    static generateArrayProperty(name: string, required: boolean): PropertySignature {
+        return factory.createPropertySignature(undefined, name, this.generateQuestionToken(required), factory.createArrayTypeNode(this.node));
     }
 
 }
@@ -29,16 +33,20 @@ export class BoolPropertyFactory extends PropertyFactory {
 /* aliasName → Article propertyName → article */
 
 export class ReferencePropertyFactory {
+    private static generateQuestionToken(required: boolean): PunctuationToken<SyntaxKind.QuestionToken> | undefined {
+        return required ? undefined : factory.createToken(SyntaxKind.QuestionToken);
+    }
+
     private static generateReferenceNode(aliasName: string): TypeReferenceNode {
         return factory.createTypeReferenceNode(factory.createIdentifier(aliasName), undefined);
     }
 
-    static generateProperty(aliasName: string, propertyName: string): PropertySignature {
-        return factory.createPropertySignature(undefined, propertyName, undefined, this.generateReferenceNode(aliasName));
+    static generateProperty(aliasName: string, propertyName: string, required: boolean): PropertySignature {
+        return factory.createPropertySignature(undefined, propertyName, this.generateQuestionToken(required), this.generateReferenceNode(aliasName));
     }
 
-    static generateArrayProperty(aliasName: string, propertyName: string): PropertySignature {
-        return factory.createPropertySignature(undefined, propertyName, undefined, factory.createArrayTypeNode(this.generateReferenceNode(aliasName)));
+    static generateArrayProperty(aliasName: string, propertyName: string, required: boolean): PropertySignature {
+        return factory.createPropertySignature(undefined, propertyName, this.generateQuestionToken(required), factory.createArrayTypeNode(this.generateReferenceNode(aliasName)));
     }
 }
 
