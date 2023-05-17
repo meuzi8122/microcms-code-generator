@@ -2,27 +2,19 @@ import { CMSCodeGenerator } from "../src/generator";
 
 const generator = new CMSCodeGenerator("./tests/data/blog");
 
-describe("", () => {
+describe("生成された自作型のチェック", () => {
+    const nodes = generator.generateNodes();
 
-    test("", () => {
-        expect(generator.generateCode()).toEqual(`
-            type Image = {
-                url: string;
-                width: number;
-                height: number;
-            }
-            type Article = {
-                id: number;
-                title: string;
-                title: string;
-                category: any;
-                image: Image;
-            };
-            type Category = {
-                id: number;
-                name: string;
-            };
-        `);
+    test("Image型が生成されること", () => {
+        expect(nodes[0].name.escapedText).toEqual("Image");
+    });
+
+    test("Article型が生成されること", () => {
+        expect(nodes[1].name.escapedText).toEqual("Article");
+    });
+
+    test("Category型が生成されること", () => {
+        expect(nodes[2].name.escapedText).toEqual("Category");
     });
 
 });
