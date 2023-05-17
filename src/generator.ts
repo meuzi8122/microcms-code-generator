@@ -1,8 +1,10 @@
 import * as fs from "fs";
 import { ListFormat, NodeArray, ScriptTarget, TypeAliasDeclaration, createPrinter, createSourceFile, factory } from "typescript";
 import { CustomAliasFactory, ImageAlias } from "./factory/alias";
-import { AnyPropertyFactory, BoolPropertyFactory, NumberPropertyFactory, ReferencePropertyFactory, StringPropertyFactory } from "./factory/property";
+import { BoolPropertyFactory, NumberPropertyFactory, PropertyFactory, ReferencePropertyFactory, StringPropertyFactory } from "./factory/property";
 import type { Schema } from "./type";
+
+const pluralize = require("pluralize");
 
 const printer = createPrinter();
 
@@ -25,21 +27,30 @@ export class CMSCodeGenerator {
 
     }
 
+    private getRelatedSchemaName(fieldId: string): string | null {
+        const schema = this.schemas.find(schema => schema.name === fieldId.charAt(0).toUpperCase() + fieldId.slice(1).toLowerCase());
+        return schema ? schema.name : null;
+    }
+
     private generateAlias(schema: Schema): TypeAliasDeclaration {
         const properties = schema.fields.map(field => {
             if (field.kind === "number") {
-                return NumberPropertyFactory.generate(field.fieldId);
+                return NumberPropertyFactory.generateProperty(field.fieldId);
             } else if (field.kind === "boolean") {
-                return BoolPropertyFactory.generate(field.fieldId);
+                return BoolPropertyFactory.generateProperty(field.fieldId);
             } else if (["text", "textArea"].includes(field.kind)) {   // TODO: リッチテキストエディタ
-                return StringPropertyFactory.generate(field.fieldId);
+                return StringPropertyFactory.generateProperty(field.fieldId);
             } else if (field.kind === "image") {
-                return ReferencePropertyFactory.generate("Image", field.fieldId);
+                return ReferencePropertyFactory.generateProperty("Image", field.fieldId);
             } else if (field.kind === "relation") {
-                const relation = this.schemas.find(schema => schema.name === field.fieldId.charAt(0).toUpperCase() + field.fieldId.slice(1).toLowerCase());
-                return relation ? ReferencePropertyFactory.generate(relation.name, field.fieldId) : AnyPropertyFactory.generate(field.fieldId);
+                const relatedSchemaName = this.getRelatedSchemaName(field.fieldId);
+                return relatedSchemaName ? ReferencePropertyFactory.generateProperty(relatedSchemaName, field.fieldId) : PropertyFactory.generateProperty(field.fieldId);
+            } else if (field.kind === "relationList") {
+                /* 複数形を単数形に変換 */
+                const relatedSchemaName = this.getRelatedSchemaName(pluralize(field.fieldId, 1));
+                return relatedSchemaName ? ReferencePropertyFactory.generateArrayProperty(relatedSchemaName, field.fieldId) : PropertyFactory.generateProperty(field.fieldId);
             } else {
-                return AnyPropertyFactory.generate(field.fieldId);
+                return PropertyFactory.generateProperty(field.fieldId);
             }
         });
 

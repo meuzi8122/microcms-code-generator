@@ -17,7 +17,7 @@ export class CustomAliasFactory {
 
 
 export const ImageAlias = CustomAliasFactory.generate("Image", [
-    StringPropertyFactory.generate("url"),
-    NumberPropertyFactory.generate("width"), // TODO: optional
-    NumberPropertyFactory.generate("height") // TODO: optional
+    StringPropertyFactory.generateProperty("url"),
+    NumberPropertyFactory.generateProperty("width"), // TODO: optional
+    NumberPropertyFactory.generateProperty("height") // TODO: optional
 ]);
