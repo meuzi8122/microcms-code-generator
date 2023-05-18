@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { ListFormat, NodeArray, ScriptTarget, TypeAliasDeclaration, createPrinter, createSourceFile, factory } from "typescript";
-import { CustomAliasFactory, ImageAlias } from "./factory/alias";
+import { CustomAliasFactory, DomainValueAlias, ImageAlias } from "./factory/alias";
 import { BoolPropertyFactory, NumberPropertyFactory, PropertyFactory, ReferencePropertyFactory, StringPropertyFactory } from "./factory/property";
 import type { Schema } from "./type";
 
@@ -49,6 +49,8 @@ export class CMSCodeGenerator {
                 /* 複数形を単数形に変換 */
                 const relatedSchemaName = this.getRelatedSchemaName(pluralize(field.fieldId, 1));
                 return relatedSchemaName ? ReferencePropertyFactory.generateArrayProperty(relatedSchemaName, field.fieldId, Boolean(field.required)) : PropertyFactory.generateProperty(field.fieldId, Boolean(field.required));
+            } else if (field.kind === "select") {
+                return ReferencePropertyFactory.generateArrayProperty("DomainValue", field.fieldId, Boolean(field.required));
             } else {
                 return PropertyFactory.generateProperty(field.fieldId, Boolean(field.required));
             }
@@ -58,7 +60,7 @@ export class CMSCodeGenerator {
     }
 
     generateNodes(): NodeArray<TypeAliasDeclaration> {
-        return factory.createNodeArray([ImageAlias, ...this.schemas.map(schema => this.generateAlias(schema))]);
+        return factory.createNodeArray([DomainValueAlias, ImageAlias, ...this.schemas.map(schema => this.generateAlias(schema))]);
     }
 
     generateCode(): string {

@@ -1,5 +1,5 @@
 import { PropertySignature, TypeAliasDeclaration, factory } from "typescript";
-import { NumberPropertyFactory, StringPropertyFactory } from "./property";
+import { NumberPropertyFactory, PropertyFactory, StringPropertyFactory } from "./property";
 
 
 export class CustomAliasFactory {
@@ -16,8 +16,14 @@ export class CustomAliasFactory {
 }
 
 
+export const DomainValueAlias = CustomAliasFactory.generate("DomainValue", [
+    StringPropertyFactory.generateProperty("id", true),
+    PropertyFactory.generateProperty("value", true),
+]);
+
+
 export const ImageAlias = CustomAliasFactory.generate("Image", [
     StringPropertyFactory.generateProperty("url", true),
-    NumberPropertyFactory.generateProperty("width", true), // TODO: optional
-    NumberPropertyFactory.generateProperty("height", true) // TODO: optional
+    NumberPropertyFactory.generateProperty("width", true),
+    NumberPropertyFactory.generateProperty("height", true)
 ]);
